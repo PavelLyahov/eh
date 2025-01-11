@@ -20,7 +20,6 @@ var (
 	nextID    = 1
 )
 
-// GetAllPhrases - возвращает все фразы
 func GetAllPhrases(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	phrasesMu.Lock()

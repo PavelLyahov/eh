@@ -25,8 +25,9 @@ async function addPhrase(event) {
     const text = document.getElementById("text").value;
     const translation = document.getElementById("translation").value;
     const level = document.getElementById("level").value;
+    const file = fileSelector.value;
 
-    const response = await fetch(API_BASE, {
+    const response = await fetch(`/api/files/phrases?file=${file}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, translation, level: parseInt(level) }),
@@ -51,6 +52,42 @@ async function deletePhrase(id) {
         alert("Failed to delete phrase.");
     }
 }
+
+const fileSelector = document.getElementById("fileSelector");
+
+async function loadFiles() {
+    const response = await fetch("/api/files");
+    const files = await response.json();
+
+    fileSelector.innerHTML = files.map(
+        (file) => `<option value="${file}">${file}</option>`
+    ).join("");
+}
+
+async function createFile(event) {
+    event.preventDefault();
+    const newFileName = document.getElementById("newFileName").value;
+
+    const response = await fetch("/api/files", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: newFileName }),
+    });
+
+    if (response.ok) {
+        document.getElementById("createFileForm").reset();
+        loadFiles();
+    } else {
+        alert("Failed to create file.");
+    }
+}
+
+
+
+// Инициализация
+document.getElementById("createFileForm").addEventListener("submit", createFile);
+loadFiles();
+
 
 document.getElementById("addPhraseForm").addEventListener("submit", addPhrase);
 

@@ -10,6 +10,16 @@
 <div class="container">
     <h1>Phrase Manager</h1>
 
+    <div class="file-manager">
+        <h2>File Manager</h2>
+        <form id="createFileForm">
+            <input type="text" id="newFileName" placeholder="File Name" required>
+            <button type="submit">Create File</button>
+        </form>
+        <select id="fileSelector"></select>
+    </div>
+
+
     <form id="addPhraseForm">
         <input type="text" id="text" placeholder="English Phrase" required>
         <input type="text" id="translation" placeholder="Translation" required>
