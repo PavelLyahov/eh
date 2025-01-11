@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phrase Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Phrase Manager</h1>
+
+    <form id="addPhraseForm">
+        <input type="text" id="text" placeholder="English Phrase" required>
+        <input type="text" id="translation" placeholder="Translation" required>
+        <select id="level">
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+            <option value="3">Level 3</option>
+        </select>
+        <button type="submit">Add Phrase</button>
+    </form>
+
+    <ul id="phrasesList"></ul>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
