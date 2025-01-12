@@ -4,7 +4,6 @@ import (
 	"eh/internal/models"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -26,7 +25,7 @@ func GetPhrasesFromFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filePath := filepath.Join(baseDir, fileName)
-	data, err := ioutil.ReadFile(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		http.Error(w, "Failed to read file", http.StatusInternalServerError)
 		return
@@ -55,7 +54,7 @@ func AddPhraseToFile(w http.ResponseWriter, r *http.Request) {
 	filesMu.Lock()
 	defer filesMu.Unlock()
 
-	data, err := ioutil.ReadFile(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		http.Error(w, "Failed to read file", http.StatusInternalServerError)
 		return
@@ -75,7 +74,7 @@ func AddPhraseToFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ioutil.WriteFile(filePath, newData, 0644); err != nil {
+	if err := os.WriteFile(filePath, newData, 0644); err != nil {
 		http.Error(w, "Failed to write file", http.StatusInternalServerError)
 		return
 	}

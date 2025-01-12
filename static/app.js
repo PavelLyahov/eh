@@ -42,7 +42,7 @@ async function createFile(event) {
 
     if (response.ok) {
         document.getElementById("createFileForm").reset();
-        loadFiles();
+        await loadFiles();
     } else {
         handleError(response);
     }
@@ -57,7 +57,7 @@ async function renameFile(file) {
     });
 
     if (response.ok) {
-        loadFiles();
+        await loadFiles();
     } else {
         handleError(response);
     }
@@ -75,7 +75,7 @@ async function deleteFile(file) {
             selectedFile = null;
             document.getElementById("phraseManager").style.display = "none";
         }
-        loadFiles();
+        await loadFiles();
     } else {
         handleError(response);
     }
@@ -86,8 +86,8 @@ async function selectFile(file) {
     document.getElementById("phraseManager").style.display = "block";
     document.getElementById("currentFileName").textContent = file;
 
-    loadPhrases(file);
-    loadFiles();
+    await loadPhrases(file);
+    await loadFiles();
 }
 
 function handleError(response) {

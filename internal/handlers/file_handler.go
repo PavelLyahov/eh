@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,7 +17,7 @@ func ListFiles(w http.ResponseWriter, r *http.Request) {
 	filesMu.Lock()
 	defer filesMu.Unlock()
 
-	files, err := ioutil.ReadDir(baseDir)
+	files, err := os.ReadDir(baseDir)
 	if err != nil {
 		http.Error(w, "Failed to list files", http.StatusInternalServerError)
 		return
@@ -53,7 +52,7 @@ func CreateFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ioutil.WriteFile(filePath, []byte("[]"), 0644); err != nil {
+	if err := os.WriteFile(filePath, []byte("[]"), 0644); err != nil {
 		http.Error(w, "Failed to create file", http.StatusInternalServerError)
 		return
 	}
