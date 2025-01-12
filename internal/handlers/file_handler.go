@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -25,7 +27,7 @@ func ListFiles(w http.ResponseWriter, r *http.Request) {
 	var filenames []string
 	for _, file := range files {
 		if !file.IsDir() && filepath.Ext(file.Name()) == ".json" {
-			filenames = append(filenames, file.Name())
+			filenames = append(filenames, strings.ReplaceAll(file.Name(), ".json", ""))
 		}
 	}
 
@@ -59,65 +61,62 @@ func CreateFile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func GetPhrasesFromFile(w http.ResponseWriter, r *http.Request) {
-	fileName := r.URL.Query().Get("file")
-	if fileName == "" {
-		http.Error(w, "File name is required", http.StatusBadRequest)
-		return
-	}
-
-	filePath := filepath.Join(baseDir, fileName)
-	data, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		http.Error(w, "Failed to read file", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
-}
-
-func AddPhraseToFile(w http.ResponseWriter, r *http.Request) {
-	fileName := r.URL.Query().Get("file")
-	if fileName == "" {
-		http.Error(w, "File name is required", http.StatusBadRequest)
-		return
-	}
-
-	var phrase Phrase
-	if err := json.NewDecoder(r.Body).Decode(&phrase); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	filePath := filepath.Join(baseDir, fileName)
+func RenameFile(w http.ResponseWriter, r *http.Request) {
 	filesMu.Lock()
 	defer filesMu.Unlock()
 
-	data, err := ioutil.ReadFile(filePath)
+	oldName := r.URL.Query().Get("oldName")
+	newName := r.URL.Query().Get("newName")
+
+	if oldName == "" || newName == "" {
+		http.Error(w, "Both oldName and newName must be provided", http.StatusBadRequest)
+		return
+	}
+
+	oldPath := fmt.Sprintf("./data/%s.json", oldName)
+	newPath := fmt.Sprintf("./data/%s.json", newName)
+
+	if _, err := os.Stat(oldPath); os.IsNotExist(err) {
+		http.Error(w, "Old file does not exist", http.StatusNotFound)
+		return
+	}
+
+	if _, err := os.Stat(newPath); err == nil {
+		http.Error(w, "File with the new name already exists", http.StatusConflict)
+		return
+	}
+
+	err := os.Rename(oldPath, newPath)
 	if err != nil {
-		http.Error(w, "Failed to read file", http.StatusInternalServerError)
+		http.Error(w, "Failed to rename file", http.StatusInternalServerError)
 		return
 	}
 
-	var phrases []Phrase
-	if err := json.Unmarshal(data, &phrases); err != nil {
-		http.Error(w, "Failed to parse file", http.StatusInternalServerError)
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeleteFile(w http.ResponseWriter, r *http.Request) {
+	filesMu.Lock()
+	defer filesMu.Unlock()
+
+	fileName := r.URL.Query().Get("file")
+	if fileName == "" {
+		http.Error(w, "File name is required", http.StatusBadRequest)
 		return
 	}
 
-	phrases = append(phrases, phrase)
+	filePath := fmt.Sprintf("./data/%s.json", fileName)
 
-	newData, err := json.Marshal(phrases)
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		http.Error(w, "File does not exist", http.StatusNotFound)
+		return
+	}
+
+	err := os.Remove(filePath)
 	if err != nil {
-		http.Error(w, "Failed to save data", http.StatusInternalServerError)
+		http.Error(w, "Failed to delete file", http.StatusInternalServerError)
 		return
 	}
 
-	if err := ioutil.WriteFile(filePath, newData, 0644); err != nil {
-		http.Error(w, "Failed to write file", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 }
