@@ -12,7 +12,7 @@
     <section id="fileManager" class="collapsible">
         <h2 class="collapsible-header">Manage Files</h2>
         <div class="collapsible-content">
-            <form id="createFileForm">
+            <form id="createFileForm" autocomplete="off">
                 <input type="text" id="newFileName" placeholder="New File Name" required>
                 <button type="submit">Create File</button>
             </form>
@@ -23,7 +23,7 @@
     <section id="phraseManager" class="collapsible">
         <h2 class="collapsible-header">Manage Phrases in <span id="currentFileName"></span></h2>
         <div class="collapsible-content">
-            <form id="addPhraseForm">
+            <form id="addPhraseForm" autocomplete="off">
                 <input type="text" id="text" placeholder="English Phrase" required>
                 <input type="text" id="translation" placeholder="Translation" required>
                 <select id="level">

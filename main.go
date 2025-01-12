@@ -25,6 +25,8 @@ func main() {
 			handlers.CreateFile(w, r)
 		case http.MethodDelete:
 			handlers.DeleteFile(w, r)
+		case http.MethodPatch:
+			handlers.RenameFile(w, r)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
